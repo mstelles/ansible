@@ -1,0 +1,58 @@
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - ../keys.yaml
+  tasks:
+    - name: changet instance state according to tags
+      ec2:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        state: running
+        wait: yes
+        instance_tags:
+          Name: Testing
+      register: ec2
+
+    - name: output the IP of the instances
+      debug: 
+        msg: "IP address: {{ item.public_ip }}"
+      loop: "{{ ec2.instances }}"
+
+    - name: add host to memory inventory
+      add_host:
+        hostname: "{{ item.public_ip }}"
+        groupname: newhosts
+        ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+        ansible_ssh_private_key_file: /home/ansible/nvirginia.pem
+      loop: "{{ ec2.instances }}"
+
+- hosts: newhosts
+  gather_facts: no
+  remote_user: ec2-user
+  tasks:
+    - name: waiting for ssh
+      wait_for_connection:
+
+    - name: collect instance facts
+      ec2_metadata_facts:
+      register: ec2_meta_facts
+
+- hosts: localhost
+  gather_facts: yes
+  vars_files: 
+    - ../keys.yaml
+  tasks:
+    - name: check out gathered facts
+      debug:
+        var: hostvars[groups['newhosts'][0]]['ansible_ec2_instance_id']
+
+    - name: change instance state by tag
+      ec2:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        state: stopped
+        instance_tags:
+          Name: Testing
+      register: ec2

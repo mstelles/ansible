@@ -1,0 +1,13 @@
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - ../keys.yaml
+  tasks:
+    - name: delete ami
+      ec2_ami:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        image_id: ami-0816d09be0d98b6a4
+        name: ansibleAMI
+        state: absent

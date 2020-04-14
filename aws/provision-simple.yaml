@@ -1,12 +1,12 @@
 - hosts: localhost
   gather_facts: no
   vars_files:
-    - keys.yaml
+    - ../keys.yaml
   tasks:
     - name: provision ec2 instance - IAD
       ec2:
-        aws_access_key: "{{ AWS_ACCESS_KEY_ID }}"
-        aws_secret_key: "{{ AWS_SECRET_ACCESS_KEY_ID }}"
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
         ec2_region: "{{ AWS_REGION }}"
         key_name: n.virginia
         instance_type: t2.micro

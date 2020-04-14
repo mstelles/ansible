@@ -1,0 +1,16 @@
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - ../keys.yaml
+  tasks:
+    - name: get instance facts
+      ec2_instance_info:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        filters:
+          instance-state-name: stopped
+      register: ec2_info
+    - debug:
+       #var: ec2_info.instances[0].instance_id
+       var: ec2_info.instances[0]

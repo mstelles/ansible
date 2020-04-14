@@ -1,0 +1,20 @@
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - ../keys.yaml
+  tasks:
+    - name: create key
+      ec2_key:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        name: testKeyPair
+      register: keypair
+    - debug: 
+        var: keypair
+    - name: writie key to disk
+      lineinfile:
+        create: yes
+        path: /home/ansible/{{ keypair.key.name }}.pem
+        line: "{{ keypair.key.private_key }}"
+        mode: 0600
