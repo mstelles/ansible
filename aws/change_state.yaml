@@ -11,4 +11,4 @@
         ec2_region: "{{ AWS_REGION }}"
         state: stopped
         instance_tags:
-          Name: test
+          Name: Testing

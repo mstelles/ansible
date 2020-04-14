@@ -15,7 +15,7 @@
         vpc_subnet_id: subnet-c2eb7eed
         group: tubao
         wait: true
-        exact_count: 1
+        exact_count: 10
         count_tag:
           Name: Testing
         instance_tags:
@@ -27,18 +27,18 @@
     - name: add host to inventory
       add_host:
         hostname: "{{ item.public_ip }}"
-        groupname: demogroup
+        groupname: testinggroup
         ansible_ssh_comon_args: "-o StrictHostKeyChecking=no"
         ansible_ssh_private_key_file: /home/ansible/nvirginia.pem
       loop: "{{ ec2.instances }}"
 
-- hosts: demogroup
+- hosts: testinggroup
   gather_facts: no
   remote_user: ec2-user
   tasks:
     - name: wait for ssh
       wait_for_connection:
         delay: 5
-        timeout: 90
+        timeout: 180
     - name: check host status
       ping:
