@@ -1,0 +1,44 @@
+- hosts: localhost
+  gather_facts: yes
+  vars_files:
+    - ../keys.yaml
+  tasks:
+    - name: provision EC2 instance
+      ec2:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        ec2_region: "{{ AWS_REGION }}"
+        instance_type: t2.micro
+        keypair: n.virginia
+        image: ami-0323c3dd2da7fb37d
+        assign_public_ip: yes
+        vpc_subnet_id: subnet-c2eb7eed
+        group: tubao
+        wait: true
+        exact_count: 1
+        count_tag:
+          Name: Testing
+        instance_tags:
+          Name: Testing
+      register: ec2
+    - debug:
+        var: ec2
+
+    - name: add host to inventory
+      add_host:
+        hostname: "{{ item.public_ip }}"
+        groupname: demogroup
+        ansible_ssh_comon_args: "-o StrictHostKeyChecking=no"
+        ansible_ssh_private_key_file: /home/ansible/nvirginia.pem
+      loop: "{{ ec2.instances }}"
+
+- hosts: demogroup
+  gather_facts: no
+  remote_user: ec2-user
+  tasks:
+    - name: wait for ssh
+      wait_for_connection:
+        delay: 5
+        timeout: 90
+    - name: check host status
+      ping:
