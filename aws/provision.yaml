@@ -1,0 +1,18 @@
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - keys.yaml
+  tasks:
+    - name: provision ec2 instance - IAD
+      ec2:
+        aws_access_key: "{{ AWS_ACCESS_KEY_ID }}"
+        aws_secret_key: "{{ AWS_SECRET_ACCESS_KEY_ID }}"
+        ec2_region: "{{ AWS_REGION }}"
+        key_name: n.virginia
+        instance_type: t2.micro
+        image: ami-0323c3dd2da7fb37d
+        wait: yes
+        group: tubao
+        count: 1
+        vpc_subnet_id: subnet-c2eb7eed
+        assign_public_ip: yes

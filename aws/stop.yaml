@@ -1,0 +1,13 @@
+- hosts: localhost
+  gather_facts: yes
+  vars_files:
+    - keys.yaml
+  tasks:
+  - name: stop instances
+    ec2:
+      aws_access_key: "{{ AWS_ACCESS_KEY_ID }}"
+      aws_secret_key: "{{ AWS_SECRET_ACCESS_KEY_ID }}"
+      ec2_region: "{{ AWS_REGION }}"
+      state: stopped
+      instance_tags:
+         Name: docker
