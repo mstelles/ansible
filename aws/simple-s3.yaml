@@ -1,0 +1,23 @@
+# bucketname.s3.Region.amazonaws.com
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - ../keys.yaml
+  tasks:
+    - name: create bucket
+      aws_s3:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        bucket: testingansiblebucket
+        mode: create
+
+    - name: add files to bucket
+      aws_s3:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        bucket: testingansiblebucket
+        mode: put
+        object: /report.txt
+        src: /home/ansible/report.txt

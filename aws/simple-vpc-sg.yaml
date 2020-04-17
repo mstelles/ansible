@@ -1,0 +1,27 @@
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - ../keys.yaml
+  tasks:
+    - name: gather info
+      ec2_vpc_net_info:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+      register: vpc_info
+    - debug:
+        var: vpc_info.vpcs[0].vpc_id
+    - name: create a SG
+      ec2_group:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        name: TestSG
+        description: SecurityGroup
+        vpc_id: "{{ vpc_info.vpcs[0].vpc_id }}"
+        rules:
+          - proto: all
+            cidr_ip: 0.0.0.0/0
+        rules_egress:
+          - proto: all
+            cidr_ip: 0.0.0.0/0

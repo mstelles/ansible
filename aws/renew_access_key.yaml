@@ -1,0 +1,52 @@
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - ../keys.yaml
+  tasks:
+    - name: get access key name
+      iam:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        iam_type: user
+        name: ansibleuser
+        state: present
+      register: iam_info
+    - debug:
+        var: iam_info
+
+    - name: remove key
+      iam: 
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        iam_type: user
+        name: ansibleuser
+        state: update
+        access_key_ids: "{{ iam_info.user_meta.access_keys[0].access_key_id }}"
+        access_key_state: remove
+
+    - name: create new key
+      iam:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        iam_type: user
+        name: ansibleuser
+        state: update
+        access_key_state: create
+      register: new_key
+    - debug:
+        var: new_key
+
+    - name: store access key data
+      lineinfile: 
+        create: yes
+        path: /home/ansible/newkey.txt
+        line: "{{ new_key.created_keys[0].access_key_id }}"
+
+    - name: store secret key data
+      lineinfile:
+        path: /home/ansible/newkey.txt
+        line: "{{ new_key.created_keys[0].secret_access_key }}"
+

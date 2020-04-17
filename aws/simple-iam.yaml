@@ -1,0 +1,29 @@
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - ../keys.yaml
+  tasks:
+    - name: create user
+      iam:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        iam_type: user
+        state: present
+        name: ansibleuser
+        password: newPass123!
+      register: ansibleuser
+    - debug:
+        var: ansibleuser
+
+    - name: create group and add user to it
+      iam_group:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        name: ansiblegroup
+        managed_policy: 
+          - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+        users:
+          - ansibleuser
+        state: present

@@ -1,0 +1,53 @@
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - ../keys.yaml
+  tasks:
+    - name: get vpc info
+      ec2_vpc_net_info:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+      register: vpc_info
+    - name: add info to report file (VPC ID)
+      lineinfile:
+        path: /home/ansible/report.txt
+        line: "VPC ID: {{ vpc_info.vpcs[0].vpc_id}}"
+        create: yes
+
+    - name: get subnet info
+      ec2_vpc_subnet_info:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        filters:
+          vpc-id: "{{ vpc_info.vpcs[0].vpc_id}}"
+      register: subnet_info
+    - name: add line to report file (subnet ID)
+      lineinfile:
+        path: /home/ansible/report.txt
+        line: "Subnet ID: {{ subnet_info.subnets[0].subnet_id }}"
+
+    - name: get instance info
+      ec2_instance_info:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        filters:
+          tag:Name: "frontend"
+      register: instance_info
+
+    - name: get sg info
+      ec2_group_info:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        filters:
+          group-id: "{{ instance_info.instances[0].security_groups[0].group_id }}"
+      register: sg_info
+
+    - name: add line to report file (rules)
+      lineinfile:
+        path: /home/ansible/report.txt
+        line: "SG rule: {{ sg_info.security_groups[0].ip_permissions }}"
+
