@@ -1,0 +1,20 @@
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - ../keys.yaml
+  tasks:
+    - name: gather snapshot facts
+      ec2_snapshot_info:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+
+    - name: create snapshot
+      ec2_snapshot:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        instance_id: i-05d565ecefd17b433
+        device_name: /dev/xvda
+        state: present
+        description: "backing up..."

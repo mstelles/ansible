@@ -1,0 +1,21 @@
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - ../keys.yaml
+  tasks:
+    - name: add alarm
+      ec2_metric_alarm:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        state: present
+        name: "cpu-high"
+        metric: "CPUUtilization"
+        namespace: "AWS/EC2"
+        statistic: Average
+        comparison: ">="
+        threshold: 90.0
+        period: 300
+        evaluation_periods: 3
+        unit: "Percent"
+        dimensions: {'InstanceId':'i-0d2f8ab54b7f283ea'}

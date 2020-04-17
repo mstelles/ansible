@@ -1,0 +1,12 @@
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - ../keys.yaml
+  tasks:
+    - name: del alarm
+      ec2_metric_alarm:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        state: absent
+        name: "cpu-high"

@@ -1,0 +1,18 @@
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - ../keys.yaml
+  tasks:
+    - name: create ebs vol
+      ec2_vol:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        #zone: "{{ AWS_REGION }}"a
+        zone: us-east-1a
+        name: ansibleEBS
+        volume_size: "1"
+        device_name: /dev/xvdf
+      register: vol_info
+    - debug: 
+        var: vol_info

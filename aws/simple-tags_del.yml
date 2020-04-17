@@ -1,0 +1,15 @@
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - ../keys.yaml
+  tasks:
+    - name: del tags
+      ec2_tag:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        resource: i-0d2f8ab54b7f283ea
+        tags:
+          system: frontend
+          version: "1.1"
+        state: absent

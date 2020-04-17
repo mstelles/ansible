@@ -1,0 +1,16 @@
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - ../keys.yaml
+  tasks:
+    - name: list tags
+      ec2_tag:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        resource: i-0d2f8ab54b7f283ea
+        state: list
+      register: tags
+    - name: display tags
+      debug:
+        var: tags.tags

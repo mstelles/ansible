@@ -1,0 +1,18 @@
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - ../keys.yaml
+  tasks:
+    - name: delete ebs vol
+      ec2_vol:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        #zone: "{{ AWS_REGION }}"a
+        instance: None
+        id: vol-0329af7237a02466a
+        delete_on_termination: yes
+        state: absent
+      register: vol_info
+    - debug: 
+        var: vol_info

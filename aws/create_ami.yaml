@@ -1,0 +1,49 @@
+- hosts: client01
+  become: yes
+  tasks:
+    - name: update
+      yum:
+        name: "*"
+        state: latest
+    - name: install httpd
+      yum:
+        name: httpd
+        state: latest
+    - name: enable and start httpd
+      systemd:
+        name: httpd
+        enabled: yes
+        state: started
+    - name: create / update changelog file
+      file:
+        path: /home/ansible/image.txt
+        state: touch
+    - name: update changelog file
+      lineinfile:
+        path: /home/ansible/image.txt
+        line: "Image generated at {{ ansible_date_time.date }} {{ ansible_date_time.time }}"
+    - name: gather info
+      ec2_metadata_facts:
+
+- hosts: localhost
+  vars_files:
+    - ../keys.yaml
+  tasks:
+    - name: stop client01
+      local_action: ec2
+      args:
+        state: stopped
+        instance_id: "{{ hostvars['client01'].ansible_ec2_instance_id }}"
+        wait: yes
+    - name: create ami
+      local_action: ec2_ami
+      args:
+        state: present
+        instance_id: "{{ hostvars['client01'].ansible_ec2_instance_id }}"
+        name: UpdatedAMI
+      register: ami_output
+    - name:
+      lineinfile:
+        create: yes
+        path: /home/ansible/ami.txt
+        line: "{{ ami_output.image_id }}"

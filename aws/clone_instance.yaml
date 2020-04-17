@@ -1,0 +1,38 @@
+# clone instance based on tag
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - ../keys.yaml
+  tasks:
+    - name: get configs from instance
+      ec2_instance_info:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        filters:
+          tag:tier: frontend
+      register: ec2_info
+    - debug:
+        var: ec2_info
+
+    - name: stop running instance
+      ec2:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        state: stopped
+        instance_tags:
+          tier: frontend
+
+    - name: deploy new instance
+      ec2:
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        aws_region: "{{ AWS_REGION }}"
+        instance_type: "{{ ec2_info.instances[0].instance_type }}"
+        image: "{{ ec2_info.instances[0].image_id }}"
+        assign_public_ip: yes
+        vpc_subnet_id: "{{ ec2_info.instances[0].subnet_id }}"
+        instance_tags:
+          tier: frontend
+          Name: Instance v2.0
