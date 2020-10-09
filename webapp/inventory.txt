@@ -1,0 +1,4 @@
+[webservers]
+ansible01 ansible_host=172.17.0.2 ansible_ssh_pass=123
+ansible02 ansible_host=172.17.0.3 ansible_ssh_pass=123
+ansible03 ansible_host=172.17.0.4 ansible_ssh_pass=123
