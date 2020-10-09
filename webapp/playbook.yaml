@@ -33,12 +33,15 @@
         state: present
 
     - name: Create DB user
-      mysql_user:
+      community.mysql.mysql_user:
         name: db_user
         password: 123
         priv: '*.*:ALL'
         state: present
         host: '%'
+
+    - name: Create and add data to 'employee' table
+      community.mysql.mysql_db: name=employee_db state=import target=dump.sql.bz2
 
     - name: Install flask
       pip:
