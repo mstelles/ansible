@@ -1,0 +1,5 @@
+[k8smaster]
+k8smaster01 ansible_host=192.168.0.100
+
+[k8sworker]
+k8sworker01 ansible_host=192.168.0.101

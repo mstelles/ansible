@@ -33,22 +33,13 @@
         state: present
 
     - name: Create DB user
-      community.mysql.mysql_user:
+      mysql_user:
         name: db_user
         password: 123
         priv: '*.*:ALL'
         state: present
         host: '%'
 
-    - name: Create and add data to 'employee' table
-      community.mysql.mysql_db: name=employee_db state=import target=dump.sql.bz2
-
     - name: Install flask
       pip:
         name: ['flask', 'flask-mysql']
-
-    - name: copy src code
-      copy: src=app.py dest=/opt/app.py
-
-    - name: start web server
-      shell: FLASK_APP=/opt/app.py nohup flask run --host=0.0.0.0 &
